@@ -18,7 +18,7 @@ class OrangeSms
     private string $msg;
 
     /**
-     * __construct
+     * Class constructor
      *
      * @param string $token_basic Authorization header provided by orange
      */
@@ -35,7 +35,7 @@ class OrangeSms
     }
 
     /**
-     * _oauth for authentication
+     * Authentication for Bearer token
      *  
      * @return void
      */
@@ -58,7 +58,7 @@ class OrangeSms
     }
 
     /**
-     * setEndpoint
+     * Change api endpoint
      *
      * @param string $enpoint New enpoint url
      * @return OrangeSms
@@ -74,9 +74,9 @@ class OrangeSms
     }
 
     /**
-     * setSenderAddress
+     * Change sender address
      *
-     * @param string $sender_address Set new sender address
+     * @param string $sender_address New sender address
      * @return OrangeSms
      */
     public function setSenderAddress(string $sender_address): OrangeSms
@@ -87,9 +87,9 @@ class OrangeSms
     }
 
     /**
-     * setSenderName
+     * Change sender name 
      *
-     * @param string $sender_name new sender name
+     * @param string $sender_name New sender name
      * @return OrangeSms
      */
     public function setSenderName(string $sender_name): OrangeSms
@@ -99,9 +99,9 @@ class OrangeSms
     }
 
     /**
-     * setRegexPhone 
+     * Recipient number validation regex 
      * 
-     * @param string $regex Recipient number validation regex
+     * @param string $regex New regex ruler
      * @return OrangeSms
      */
     public function setRegexPhone(string $regex): OrangeSms
@@ -111,7 +111,7 @@ class OrangeSms
     }
 
     /**
-     * send Send new message
+     * Send new message
      *
      * @param string $recipient Recipient number
      * @param string $msg You message
@@ -157,7 +157,35 @@ class OrangeSms
     }
 
     /**
-     * _curl For call orange API
+     * Retrieve balance information and remaining credits
+     *
+     * @return array
+     */
+    public function balance(): array
+    {
+        $headers = [
+            'Content-Type' => 'application/json',
+            'Authorization' => $this->_token_bearer,
+        ];
+        return $this->_curl('GET', '/sms/admin/v1/contracts', [], $headers);
+    }
+
+    /**
+     * Get statistics related to your API
+     *
+     * @return array
+     */
+    public function statistics(): array
+    {
+        $headers = [
+            'Content-Type' => 'application/json',
+            'Authorization' => $this->_token_bearer,
+        ];
+        return $this->_curl('GET', '/sms/admin/v1/statistics', [], $headers);
+    }
+
+    /**
+     * For call orange API
      *
      * @param string $method
      * @param string $url
