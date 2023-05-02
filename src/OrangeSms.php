@@ -17,6 +17,11 @@ class OrangeSms
     private string $recipient;
     private string $msg;
 
+    /**
+     * __construct
+     *
+     * @param string $token_basic Authorization header provided by orange
+     */
     public function __construct(string $token_basic)
     {
 
@@ -26,10 +31,15 @@ class OrangeSms
 
         $this->_token_basic = $token_basic;
 
-        $this->_setAuth();
+        $this->_oauth();
     }
 
-    private function _setAuth()
+    /**
+     * _oauth for authentication
+     *  
+     * @return void
+     */
+    private function _oauth(): void
     {
 
         $headers = [
@@ -47,30 +57,68 @@ class OrangeSms
         $this->_token_bearer = 'Bearer ' . $response['access_token'];
     }
 
-    public function setEndpoint(string $enpoint)
+    /**
+     * setEndpoint
+     *
+     * @param string $enpoint New enpoint url
+     * @return OrangeSms
+     */
+    public function setEndpoint(string $enpoint): OrangeSms
     {
         if (!filter_var($enpoint, FILTER_VALIDATE_URL)) {
             throw new \Exception('OrangeSms : Invalid endpoint URL.');
         }
         $this->_endpoint = $enpoint;
+
+        return $this;
     }
 
-    public function setSenderAddress(string $sender_address)
+    /**
+     * setSenderAddress
+     *
+     * @param string $sender_address Set new sender address
+     * @return OrangeSms
+     */
+    public function setSenderAddress(string $sender_address): OrangeSms
     {
         $this->_sender_address = $sender_address;
+
+        return $this;
     }
 
-    public function setSenderName(string $sender_name)
+    /**
+     * setSenderName
+     *
+     * @param string $sender_name new sender name
+     * @return OrangeSms
+     */
+    public function setSenderName(string $sender_name): OrangeSms
     {
         $this->_sender_name = $sender_name;
+        return $this;
     }
 
-    public function setRegexPhone(string $regex)
+    /**
+     * setRegexPhone 
+     * 
+     * @param string $regex Recipient number validation regex
+     * @return OrangeSms
+     */
+    public function setRegexPhone(string $regex): OrangeSms
     {
         $this->_regex_phone = $regex;
+        return $this;
     }
 
-    public function send(string $recipient, string $msg): array
+    /**
+     * send Send new message
+     *
+     * @param string $recipient Recipient number
+     * @param string $msg You message
+     * @param string $sender_name Sender name
+     * @return array
+     */
+    public function send(string $recipient, string $msg, string $sender_name = ''): array
     {
 
         preg_match($this->_regex_phone, $recipient, $matches);
@@ -95,6 +143,10 @@ class OrangeSms
             ]
         ];
 
+        if (!empty($sender_name)) {
+            $this->_sender_name = $sender_name;
+        }
+
         if (!empty($this->_sender_name)) {
             $params['outboundSMSMessageRequest']['senderName'] = $this->_sender_name;
         }
@@ -104,6 +156,15 @@ class OrangeSms
         return $response;
     }
 
+    /**
+     * _curl For call orange API
+     *
+     * @param string $method
+     * @param string $url
+     * @param array $params
+     * @param array $headers
+     * @return array
+     */
     private function _curl(string $method = 'POST', string $url, array $params = [], array $headers = []): array
     {
 
